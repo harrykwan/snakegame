@@ -1,109 +1,161 @@
-    <!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+<!DOCTYPE html>
 <html>
-    <head>
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, see:
-            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
-        Some notes:
-            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
-        -->
-        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;"> -->
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <style type="text/css">
-            #myoutput{
-                width: 100%;
-                text-align: center;
-            }
+<head>
+	<style type="text/css">
+		td{
+			width: 5px;
+			height: 5px;
+			/*border: 1px solid white;*/
+		}
+		body{
+			background: black;
+		}
+		table{
+			border: 1px solid white;
+		}
+	</style>
+	<title></title>
+</head>
+<body>
+<table id="mygamegrid"></table>
 
-            #myrecord{
+<script type="text/javascript">
+	var snakelen = 0;
+	var snakex = [];
+	var snakey = [];
+	var snakedirection = 0; //0 up 1 down 2 left 3 right
+	var foodx = 0;
+	var foody = 0;
 
-            }
+	function init() {
+		mycreaterow('mygamegrid',50,50);
+		snakelen = 3;
+		snakedirection = 3;
+		for (var j=0; j<100; j++){
+			snakex[j] = 0;
+			snakey[j] = 0;
+		}
 
-            #myrecord>div{
-                padding: 5px;
-                padding-left: 15px;
-                margin: 5px;
-                border-left: 3px solid red;
-            }
-        </style>
-        <!-- <link rel="stylesheet" type="text/css" href="css/index.css"> -->
-        <title>myjail</title>
-    </head>
-    <body>
-        <iframe hidden id="myiframe" src="http://ierg4230.ie.cuhk.edu.hk/switch.php?act=reload&g=406"></iframe>
-        <iframe hidden id="myiframe2" src=""></iframe>
-        <!-- <button onclick="getinfo()">get information</button> -->
-        <!-- <button onclick="myreset()">reset</button> -->
+		snakex[0] = 0;
+		snakex[1] = 0;
+		snakex[2] = 0;
+		snakey[0] = 2;
+		snakey[1] = 1;
+		snakey[2] = 0;
 
-        <div id="myoutput"></div>
-        <hr>
-        <h1>LOG</h1>
-        <div id="myrecord"></dir>
-        <script type="text/javascript">
-            var mynowdata = 'start';
-            function getinfo(){
-                var x = document.getElementById("myiframe");
-                var y = (x.contentWindow || x.contentDocument);
-                if (y.document)y = y.document;
-                if (y.body.innerHTML.split('<img src="./bulb_')[1].substring(0,2)=='on'){
-                    document.getElementById('myoutput').innerHTML = 'someone going through';
-                    
-                    if (mynowdata=='off'){
-                        recorddata();
-                    }
-                    mynowdata = 'on';
+		myclearall();
+		for (var j=0; j<snakelen; j++){
+			mydraw(snakex[j],snakey[j]);
+		}
 
-                } else if (y.body.innerHTML.split('<img src="./bulb_')[1].substring(0,2)=='of') {
-                    document.getElementById('myoutput').innerHTML = 'no one passing';
-                    mynowdata = 'off';
-                }
-                // document.getElementById('myoutput').innerHTML = y.body.innerHTML;
-            }
+		genfood();
+	}
 
-            function myreset(){
-                document.getElementById('myiframe2').src = "http://ierg4230.ie.cuhk.edu.hk/switch.php?act=off&g=406";
-            }
+	init();
+	setInterval(function(){ 
+		snakemove();
+	}, 100);
 
-            function recorddata(){
-                var d = new Date();
-                document.getElementById("myrecord").innerHTML += '<div>'+d.toString().split('GMT')[0]+'</div>';
-            }
+	function genfood(){
+		foodx = Math.floor((Math.random() * 100) %50);
+		foody = Math.floor((Math.random() * 100) %50);
+	}
 
-            document.getElementById("myiframe").onload = function(){
-                getinfo();
-                if (mynowdata=='on'){
-                    setTimeout(function(){
-                        myreset();
-                    },2000)
-                }
-                
-                
-            }
-        </script>
-        <script type="text/javascript" src="cordova.js"></script>
-        <!-- <script type="text/javascript" src="js/index.js"></script> -->
-    </body>
+	document.onkeydown = function(evt){
+		evt = evt || window.event;
+	    if (evt.keyCode == 27) {
+	        //alert('Esc key pressed.');
+	        init();
+	    } else if (evt.keyCode == 38) {
+	        //up
+	        snakedirection = 0;
+	    } else if (evt.keyCode == 40) {
+	        //down
+	        snakedirection = 1;
+	    } else if (evt.keyCode == 37) {
+	        //left
+	        snakedirection = 2;
+	    } else if (evt.keyCode == 39) {
+	        //right
+	        snakedirection = 3;
+	    }
+	}
+
+	function snakemove(){
+		myclearall();
+		var tempsnakedirection = snakedirection;
+		for (var j=snakelen-1; j>0; j--){
+			snakex[j] = snakex[j-1];
+			snakey[j] = snakey[j-1];
+		}
+
+		if (snakex[j]==foodx&&snakey[j]==foody){
+			snakelen++;
+			if (tempsnakedirection==1){
+				snakex[snakelen-1] = (snakex[snakelen-2]-1+50)%50;
+				snakey[snakelen-1] = snakey[snakelen-2];
+			} else if (tempsnakedirection==0){
+				snakex[snakelen-1] = (snakex[snakelen-2]+1)%50;
+				snakey[snakelen-1] = snakey[snakelen-2];
+			} else if (tempsnakedirection==3){
+				snakey[snakelen-1] = (snakey[snakelen-2]-1+50)%50;
+				snakex[snakelen-1] = snakex[snakelen-2];
+			} else if (tempsnakedirection==2){
+				snakey[snakelen-1] = (snakey[snakelen-2]+1)%50;
+				snakex[snakelen-1] = snakex[snakelen-2];
+			}
+			genfood();
+		}
+
+		if (tempsnakedirection==0){
+			snakex[0] = (snakex[0]-1+50)%50;
+		} else if (tempsnakedirection==1){
+			snakex[0] = (snakex[0]+1)%50;
+		} else if (tempsnakedirection==2){
+			snakey[0] = (snakey[0]-1+50)%50;
+		} else if (tempsnakedirection==3){
+			snakey[0] = (snakey[0]+1)%50;
+		}
+		for (var j=0; j<snakelen; j++){
+			mydraw(snakex[j],snakey[j]);
+		}
+		mydraw(foodx,foody,1);
+	}
+
+
+	function mydraw(x,y,z) {
+		if (z)
+			document.getElementById('mygamegrid').rows[x].cells[y].style.backgroundColor = 'yellow';
+		else
+			document.getElementById('mygamegrid').rows[x].cells[y].style.backgroundColor = 'white';
+	}
+
+	function myclearall(){
+		var mytable = document.getElementById('mygamegrid');
+		for (var j=0; j<mytable.rows.length; j++){
+			for (var k=0; k<mytable.rows.length; k++){
+				mytable.rows[j].cells[k].style.backgroundColor = 'black';
+			}
+		}
+	}
+
+
+	function mycreaterow(tableID,x,y) {
+	  // Get a reference to the table
+	  var tableRef = document.getElementById(tableID);
+	  tableRef.innerHTML = '';
+
+	  for (var j=0; j<x; j++){
+	  	 // Insert a row at the end of the table
+		  var newRow = tableRef.insertRow(-1);
+
+		  // Insert a cell in the row at index 0
+		  for (var k=0; k<y; k++)
+		  	var newCell = newRow.insertCell(0);
+	  }
+	 
+	}
+
+</script>
+</body>
 </html>
