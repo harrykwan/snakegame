@@ -1,0 +1,109 @@
+    <!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;"> -->
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <style type="text/css">
+            #myoutput{
+                width: 100%;
+                text-align: center;
+            }
+
+            #myrecord{
+
+            }
+
+            #myrecord>div{
+                padding: 5px;
+                padding-left: 15px;
+                margin: 5px;
+                border-left: 3px solid red;
+            }
+        </style>
+        <!-- <link rel="stylesheet" type="text/css" href="css/index.css"> -->
+        <title>myjail</title>
+    </head>
+    <body>
+        <iframe hidden id="myiframe" src="http://ierg4230.ie.cuhk.edu.hk/switch.php?act=reload&g=406"></iframe>
+        <iframe hidden id="myiframe2" src=""></iframe>
+        <!-- <button onclick="getinfo()">get information</button> -->
+        <!-- <button onclick="myreset()">reset</button> -->
+
+        <div id="myoutput"></div>
+        <hr>
+        <h1>LOG</h1>
+        <div id="myrecord"></dir>
+        <script type="text/javascript">
+            var mynowdata = 'start';
+            function getinfo(){
+                var x = document.getElementById("myiframe");
+                var y = (x.contentWindow || x.contentDocument);
+                if (y.document)y = y.document;
+                if (y.body.innerHTML.split('<img src="./bulb_')[1].substring(0,2)=='on'){
+                    document.getElementById('myoutput').innerHTML = 'someone going through';
+                    
+                    if (mynowdata=='off'){
+                        recorddata();
+                    }
+                    mynowdata = 'on';
+
+                } else if (y.body.innerHTML.split('<img src="./bulb_')[1].substring(0,2)=='of') {
+                    document.getElementById('myoutput').innerHTML = 'no one passing';
+                    mynowdata = 'off';
+                }
+                // document.getElementById('myoutput').innerHTML = y.body.innerHTML;
+            }
+
+            function myreset(){
+                document.getElementById('myiframe2').src = "http://ierg4230.ie.cuhk.edu.hk/switch.php?act=off&g=406";
+            }
+
+            function recorddata(){
+                var d = new Date();
+                document.getElementById("myrecord").innerHTML += '<div>'+d.toString().split('GMT')[0]+'</div>';
+            }
+
+            document.getElementById("myiframe").onload = function(){
+                getinfo();
+                if (mynowdata=='on'){
+                    setTimeout(function(){
+                        myreset();
+                    },2000)
+                }
+                
+                
+            }
+        </script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <!-- <script type="text/javascript" src="js/index.js"></script> -->
+    </body>
+</html>
