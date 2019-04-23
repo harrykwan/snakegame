@@ -18,6 +18,10 @@
 </head>
 <body>
 <table id="mygamegrid"></table>
+	
+	<button onclick="changedirection(0)">^</button><br>
+	<button onclick="changedirection(2)"><</button><button onclick="changedirection(3)">></button>
+	<button onclick="changedirection(1)">_</button>
 
 <script type="text/javascript">
 	var snakelen = 0;
@@ -26,7 +30,11 @@
 	var snakedirection = 0; //0 up 1 down 2 left 3 right
 	var foodx = 0;
 	var foody = 0;
-
+	
+	function changedirection(x){
+		snakedirection = x;
+	}
+	
 	function init() {
 		mycreaterow('mygamegrid',50,50);
 		snakelen = 3;
